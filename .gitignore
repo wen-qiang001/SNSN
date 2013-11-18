@@ -1,6 +1,12 @@
+lib
+neo4j-community-2.0.0-M06
+social_graph.db
+
 *.class
 
 # Package Files #
 *.jar
 *.war
 *.ear
+
+NeoSocial/.classpath

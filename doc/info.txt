@@ -1,0 +1,22 @@
+
+Nodes info 
+===
+
+		neoid	index
+Switzerland	0
+Cantons		-		
+Regions		-
+Cities		-	“0001” - “6810”
+
+
+Tot. nodes 
+===
+
+Default node	     1
+Switzerland  	     1
+Cantons	     	    26
+Regions		   139
+Municipalities	  2485
+Inhabitants  8’039’060 
+
+	     8’041’712
