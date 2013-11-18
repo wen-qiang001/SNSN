@@ -13,7 +13,7 @@ public class Main
 	public static String municipalitiesIndex = "municipalities";
 	public static String inhabitantsIndex    = "inhabitants";
 	
-	public static int maxMunicipalities = 20;
+	public static int maxMunicipalities = 50;
 	
 	public static void main(String[] args) 
 	{	

@@ -12,21 +12,33 @@ public class Utilities
 	
 	public static String[][] getNames()
 	{
-		String path = Main.filesPath + "names.csv";
+		// females
+		String path = Main.filesPath + "swiss_names_F.csv";
 		List<String[]> splitted = splitFile(path);
 		
 		String[] femaleNames = new String[1000];
-		String[] maleNames   = new String[1000];
 		
 		int i = 0;
 		for (String[] s : splitted) 
-		{
-			femaleNames[i] = s[1];
-			maleNames[i] = s[3];
+		{			
+			femaleNames[i] = s[0];
 			i++;
 		}
 		
+		// males
+		path = Main.filesPath + "swiss_names_M.csv";
+		splitted = splitFile(path);
 		
+		String[] maleNames   = new String[1000];
+		
+		i = 0;
+		for (String[] s : splitted) 
+		{
+			maleNames[i] = s[0];
+			i++;
+		}
+
+		// last names
 		path = Main.filesPath + "lastnames.csv";		
 		splitted = splitFile(path);
 		
