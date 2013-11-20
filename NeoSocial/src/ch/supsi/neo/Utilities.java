@@ -1,9 +1,10 @@
 package ch.supsi.neo;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,48 +13,23 @@ public class Utilities
 	
 	public static String[][] getNames()
 	{
-		// females
-		String path = Main.filesPath + "swiss_names_F.csv";
-		List<String[]> splitted = splitFile(path);
+		String path1 = Main.filesPath + Main.femaleNamesFile;
+		String path2 = Main.filesPath + Main.maleNamesFile;
+		String path3 = Main.filesPath + Main.lastnamesFile;
 		
-		String[] femaleNames = new String[1000];
-		
-		int i = 0;
-		for (String[] s : splitted) 
-		{			
-			femaleNames[i] = s[0];
-			i++;
-		}
-		
-		// males
-		path = Main.filesPath + "swiss_names_M.csv";
-		splitted = splitFile(path);
-		
-		String[] maleNames   = new String[1000];
-		
-		i = 0;
-		for (String[] s : splitted) 
-		{
-			maleNames[i] = s[0];
-			i++;
-		}
-
-		// last names
-		path = Main.filesPath + "lastnames.csv";		
-		splitted = splitFile(path);
-		
-		String[] lastNames   = new String[1000];
-		
-		i = 0;
-		for (String[] s : splitted) 
-		{
-			lastNames[i] = s[0];
-			i++;
-		}
-		
-		String[][] res = {femaleNames, maleNames, lastNames};
+		String[][] res = {getData(path1), getData(path2), getData(path3)};
 				
 		return res;
+	}
+	
+	private static String[] getData(String path)
+	{
+		ArrayList<String> result = new ArrayList<String>();
+				
+		for (String[] s : splitFile(path)) 
+			result.add(s[0]);
+		
+		return result.toArray(new String[0]);
 	}
 	
 	public static List<String[]> splitFile(String fileName)
@@ -64,8 +40,8 @@ public class Utilities
 
 		try
 		{
-			br = new BufferedReader(new FileReader(fileName));
-
+			br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "ISO-8859-1"));
+			
 			String line;
 			while ((line = br.readLine()) != null)
 			{

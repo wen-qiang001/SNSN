@@ -29,7 +29,7 @@ public class Creator
 	private int regionsAdded = 0;
 	private HashMap<String, Integer> municipalities = new HashMap<String, Integer>();
 	private int inhabitantsAdded = 0;
-	private List<String> socialInhabitants = new ArrayList<String>();
+	private List<Integer> socialInhabitants = new ArrayList<Integer>();
 	private int friendsAdded = 0;
 	
 	private long lStartTime;
@@ -38,11 +38,12 @@ public class Creator
 	/**
 	 * Open or creates the DB.
 	 */
-	private void openOrCreateDB()
+	@SuppressWarnings("deprecation")
+	public void openOrCreateDB()
 	{
 		db = new GraphDatabaseFactory().
 				newEmbeddedDatabaseBuilder(Main.dbPath)
-				.setConfig(GraphDatabaseSettings.node_keys_indexable, "neoid, name")
+				.setConfig(GraphDatabaseSettings.node_keys_indexable, "name")
 				//.setConfig(GraphDatabaseSettings.relationship_keys_indexable, "IS_IN, LIVES_IN, FRIEND_OF")
 				.setConfig(GraphDatabaseSettings.node_auto_indexing, "true")
 				//.setConfig(GraphDatabaseSettings.relationship_auto_indexing, "true")
@@ -51,30 +52,28 @@ public class Creator
 		registerShutdownHook(db);		
 		
 		tx = db.beginTx();
-		
 		municipalitiesIndex = db.index().forNodes(Main.municipalitiesIndex);
 		inhabitantsIndex    = db.index().forNodes(Main.inhabitantsIndex);
+		tx.success();
+		tx.finish();
 	}
 	
 	/**
 	 * Closes the DB.
 	 */
-	@SuppressWarnings("deprecation")
-	private void closeDB()
+	public void closeDB()
 	{
-		tx.finish();
-		tx = null;
-		db.shutdown();
-		
+		db.shutdown();	
 		System.gc();
 	}
 	
 	/**
 	 * Adds cantons, regions and municipalities.
 	 */
+	@SuppressWarnings("deprecation")
 	public void addGeographicalInfo()
-	{
-		openOrCreateDB();
+	{	
+		tx = db.beginTx();
 		
 		try
 		{						
@@ -88,8 +87,11 @@ public class Creator
 			System.out.println(e.toString());
 			tx.failure();
 		}
-		
-		closeDB();
+		finally
+		{
+			tx.finish();
+			tx = null;
+		}
 	}
 
 	private void addSwitzerland()
@@ -175,7 +177,7 @@ public class Creator
 		System.out.println("Adding inhabitants...");
 		
 		lStartTime = System.currentTimeMillis();
-	
+		
 		inhabitantsAdded = 0;
 				
 		int i = 0;
@@ -183,7 +185,7 @@ public class Creator
 		for (Entry<String, Integer> entry : municipalities.entrySet())
 		{
 			if(i % 10 == 0)
-				System.out.println(String.format("%d / %d municipalities - %.2f %%", i, municipalities.size(), ((float)i/(float)municipalities.size())*100f));
+				System.out.println(String.format("%d / %d - %.2f %% -  %d / %d municipalities", inhabitantsAdded, Main.totalInhabitants, ((float)inhabitantsAdded/(float)Main.totalInhabitants)*100f, i, municipalities.size()));
 			
 			addInhabitantsInMunicipality(entry.getKey(), entry.getValue());
 									
@@ -195,41 +197,47 @@ public class Creator
 		System.out.println(String.format("Added %d inhabitants (social %d) in %.2f seconds", inhabitantsAdded, socialInhabitants.size(), (lEndTime - lStartTime) / 1000.0));
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void addInhabitantsInMunicipality(String municipality, int no)
-	{	
-		openOrCreateDB();
-		
+	{						
 		try
-		{					
+		{		
+			tx = db.beginTx();
 			Node found = municipalitiesIndex.get("id", municipality).getSingle();
+			tx.success();
+			tx.finish();
 			
 			if(found != null)
 			{
+				tx = db.beginTx();
+				
 				for (int i = 0; i < no; i++)
-				{
+				{					
 					Node person = db.createNode();
-					
-					String personId = "p" + ++inhabitantsAdded;
+				
+					String personId = String.format("p%d", ++inhabitantsAdded);
 					
 					// male of female (http://www.bfs.admin.ch/bfs/portal/en/index/themen/01/02/blank/key/alter/nach_geschlecht.html)
-					int mf = rand.nextInt(1000);
-					int r1 = rand.nextInt(1000);
-					int r2 = rand.nextInt(1000);
-
+					int maleOrFemale = rand.nextInt(1000);
+					
 					String name = "";
 
-					if(mf < 494)
+					if(maleOrFemale < 494)
 					{
-						name = names[1][r1];
+						int rm = rand.nextInt(names[1].length);
+						name = names[1][rm];
 						person.setProperty("gender",  "M");
 					}
 					else
 					{
-						name = names[0][r1];
+						int rf = rand.nextInt(names[0].length);
+						name = names[0][rf];
 						person.setProperty("gender",  "F");
 					}
 
-					name = name + " " + names[2][r2];
+					int rl = rand.nextInt(names[2].length);
+					
+					name = name + " " + names[2][rl];
 					
 					person.setProperty("name",  name);
 					
@@ -239,27 +247,33 @@ public class Creator
 					if(social < 385)
 					{
 						person.setProperty("social",  "Y");
-						socialInhabitants.add(personId);
+						socialInhabitants.add(inhabitantsAdded);
 					}	
 					else
 						person.setProperty("social",  "N");
 						
 					inhabitantsIndex.add(person, "id", personId);
 					person.createRelationshipTo(found, Relation.RelTypes.LIVES_IN);
-				}
-				
-				tx.success();
+					
+					if(i > 0 && i % Main.transactionsSize == 0)
+					{
+						tx.success();
+						tx.finish();
+						tx = db.beginTx();
+					}
+				}	
 				
 				found = null;
 			}
+			
+			tx.success();
+			tx.finish();
 		}
 		catch (Exception e)
 		{
+			e.printStackTrace();
 			System.out.println(e.toString());
-			tx.failure();
 		}
-				
-		closeDB();
 	}
 
 	/**
@@ -270,46 +284,55 @@ public class Creator
 		System.out.println("Adding friends...");
 		
 		lStartTime = System.currentTimeMillis();
-		
-		openOrCreateDB();
-		
+				
 		friendsAdded = 0;
 		
 		int added = 0;
 		
-		for (String inhabitant : socialInhabitants) 
+		for (int inhabitant : socialInhabitants) 
 		{
 			//  the average friend count is 190
 			double n = rand.nextGaussian()*100 + 140; 
 			addFriendsToInhabitant(inhabitant, (int)n);
 			
-			if(added % 10 == 0)
+			if(added % 500 == 0)
 				System.out.println(String.format("%d / %d inhabitants - %.2f %%", added, socialInhabitants.size(), ((float)added/(float)socialInhabitants.size())*100f));
 			
 			added++;
 		}
-			
-		closeDB();
-		
+					
 		lEndTime = System.currentTimeMillis();
 		
 		System.out.println(String.format("Added %d friends in %.2f seconds", friendsAdded, (lEndTime - lStartTime) / 1000.0));
 	}
 	
-	private void addFriendsToInhabitant(String inhabitant, int no)
-	{
+	@SuppressWarnings("deprecation")
+	private void addFriendsToInhabitant(int inhabitant, int no)
+	{		
 		try
 		{					
-			Node found = inhabitantsIndex.get("id", inhabitant).getSingle();
+			String personId = String.format("p%d", inhabitant);
+			
+			tx = db.beginTx();
+			
+			Node found = inhabitantsIndex.get("id", personId).getSingle();
 						
 			if(found != null)
 			{
 				Node friend;
 				
 				for (int i = 0; i < no; i++)
-				{
-					int r = rand.nextInt(inhabitantsAdded) + 1;
+				{					
+					int r;
 					
+					while(true)
+					{
+						r = rand.nextInt(inhabitantsAdded) + 1;
+						
+						if(r!=inhabitant)
+							break;
+					}
+										
 					friend = inhabitantsIndex.get("id", "p" + r).next();
 					
 					if(friend != null)
@@ -318,17 +341,17 @@ public class Creator
 						friendsAdded++;
 					}
 				}
-				
-				tx.success();
-				
-				found = null;
-				friend = null;
 			}
+			tx.success();
 		}
 		catch (Exception e)
 		{
 			System.out.println(e.toString());
 			tx.failure();
+		}
+		finally
+		{
+			tx.finish();
 		}
 	}
 	
@@ -341,7 +364,6 @@ public class Creator
 		
 		System.out.println(s);
 	}
-	
 	
 	private static void registerShutdownHook(final GraphDatabaseService graphDb)
 	{

@@ -3,7 +3,7 @@ Nodes info
 ===
 
 		neoid	index
-Switzerland	0
+Switzerland	-
 Cantons		-		
 Regions		-
 Cities		-	“0001” - “6810”
