@@ -19,10 +19,10 @@ public class Main
 	
 	public static int totalInhabitants  = 8039060;
 	public static int transactionsSize  = 1000;
-	public static int maxMunicipalities = 50;
+	public static int maxMunicipalities = 9999;
 	
 	public static void main(String[] args) 
-	{	
+	{		
 		try 
 		{
 			Process p = Runtime.getRuntime().exec(neoBin + " stop");

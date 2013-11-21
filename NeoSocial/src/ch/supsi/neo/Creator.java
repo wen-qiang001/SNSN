@@ -70,7 +70,6 @@ public class Creator
 	/**
 	 * Adds cantons, regions and municipalities.
 	 */
-	@SuppressWarnings("deprecation")
 	public void addGeographicalInfo()
 	{	
 		tx = db.beginTx();
@@ -89,15 +88,13 @@ public class Creator
 		}
 		finally
 		{
-			tx.finish();
-			tx = null;
+			tx.close();
 		}
 	}
 
 	private void addSwitzerland()
 	{
 		switzerland = db.createNode();
-		//switzerland.setProperty("neoid", "0");
 		switzerland.setProperty("name", "Switzerland");
 	}
 
@@ -117,7 +114,6 @@ public class Creator
 			if(s[0].startsWith("- "))
 			{
 				Node n = db.createNode();
-				//n.setProperty("neoid", ++cantonNo );
 				n.setProperty("name",  s[0].substring(2));
 
 				n.createRelationshipTo(switzerland, Relation.RelTypes.IS_IN);
@@ -130,7 +126,6 @@ public class Creator
 			if(s[0].startsWith(">> "))
 			{
 				Node n = db.createNode();
-				//n.setProperty("neoid", ++regionNo + 50);
 				n.setProperty("name" , s[0].substring(3));
 
 				if(currentCanton != null)
@@ -197,7 +192,6 @@ public class Creator
 		System.out.println(String.format("Added %d inhabitants (social %d) in %.2f seconds", inhabitantsAdded, socialInhabitants.size(), (lEndTime - lStartTime) / 1000.0));
 	}
 	
-	@SuppressWarnings("deprecation")
 	private void addInhabitantsInMunicipality(String municipality, int no)
 	{						
 		try
@@ -205,12 +199,12 @@ public class Creator
 			tx = db.beginTx();
 			Node found = municipalitiesIndex.get("id", municipality).getSingle();
 			tx.success();
-			tx.finish();
+			tx.close();
+			
+			tx = db.beginTx();
 			
 			if(found != null)
-			{
-				tx = db.beginTx();
-				
+			{				
 				for (int i = 0; i < no; i++)
 				{					
 					Node person = db.createNode();
@@ -258,7 +252,7 @@ public class Creator
 					if(i > 0 && i % Main.transactionsSize == 0)
 					{
 						tx.success();
-						tx.finish();
+						tx.close();
 						tx = db.beginTx();
 					}
 				}	
@@ -267,12 +261,13 @@ public class Creator
 			}
 			
 			tx.success();
-			tx.finish();
+			tx.close();
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 			System.out.println(e.toString());
+			tx.failure();
 		}
 	}
 
@@ -291,8 +286,9 @@ public class Creator
 		
 		for (int inhabitant : socialInhabitants) 
 		{
-			//  the average friend count is 190
-			double n = rand.nextGaussian()*100 + 140; 
+			//  the average friend count is 90 
+			double n = rand.nextGaussian()*9 + 90;
+			
 			addFriendsToInhabitant(inhabitant, (int)n);
 			
 			if(added % 500 == 0)
@@ -303,10 +299,9 @@ public class Creator
 					
 		lEndTime = System.currentTimeMillis();
 		
-		System.out.println(String.format("Added %d friends in %.2f seconds", friendsAdded, (lEndTime - lStartTime) / 1000.0));
+		System.out.println(String.format("Added %d friends in %.2f seconds - avg. friends %.2f", friendsAdded, (lEndTime - lStartTime) / 1000.0, (float)friendsAdded/(float)socialInhabitants.size()));
 	}
 	
-	@SuppressWarnings("deprecation")
 	private void addFriendsToInhabitant(int inhabitant, int no)
 	{		
 		try
@@ -342,6 +337,7 @@ public class Creator
 					}
 				}
 			}
+			
 			tx.success();
 		}
 		catch (Exception e)
@@ -351,7 +347,7 @@ public class Creator
 		}
 		finally
 		{
-			tx.finish();
+			tx.close();
 		}
 	}
 	
