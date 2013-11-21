@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
@@ -54,6 +55,7 @@ public class Creator
 		tx = db.beginTx();
 		municipalitiesIndex = db.index().forNodes(Main.municipalitiesIndex);
 		inhabitantsIndex    = db.index().forNodes(Main.inhabitantsIndex);
+		
 		tx.success();
 		tx.finish();
 	}
@@ -92,12 +94,18 @@ public class Creator
 		}
 	}
 
+	/**
+	 * Adds the main node.
+	 */
 	private void addSwitzerland()
 	{
 		switzerland = db.createNode();
 		switzerland.setProperty("name", "Switzerland");
 	}
 
+	/**
+	 * Adds the additional geographic nodes.
+	 */
 	private void addGeo()
 	{
 		System.out.println("Adding geographical information...");
@@ -114,6 +122,14 @@ public class Creator
 			if(s[0].startsWith("- "))
 			{
 				Node n = db.createNode();
+				
+				n.addLabel(new Label() {
+					@Override
+					public String name() {
+						return "Canton";
+					}
+				});
+				
 				n.setProperty("name",  s[0].substring(2));
 
 				n.createRelationshipTo(switzerland, Relation.RelTypes.IS_IN);
@@ -122,10 +138,17 @@ public class Creator
 				
 				cantonsAdded++;
 			}
-
 			if(s[0].startsWith(">> "))
 			{
 				Node n = db.createNode();
+				
+				n.addLabel(new Label() {
+					@Override
+					public String name() {
+						return "Region";
+					}
+				});
+				
 				n.setProperty("name" , s[0].substring(3));
 
 				if(currentCanton != null)
@@ -135,7 +158,6 @@ public class Creator
 				
 				regionsAdded++;
 			}
-
 			if(s[0].startsWith("......"))
 			{
 				String id   = s[0].substring(6, 10);
@@ -145,6 +167,14 @@ public class Creator
 				municipalities.put(id, people);
 								
 				Node n = db.createNode();
+				
+				n.addLabel(new Label() {
+					@Override
+					public String name() {
+						return "Municipality";
+					}
+				});
+				
 				n.setProperty("name",  name);
 
 				municipalitiesIndex.add(n, "id", id);
@@ -208,6 +238,13 @@ public class Creator
 				for (int i = 0; i < no; i++)
 				{					
 					Node person = db.createNode();
+					
+					person.addLabel(new Label() {
+						@Override
+						public String name() {
+							return "Person";
+						}
+					});
 				
 					String personId = String.format("p%d", ++inhabitantsAdded);
 					
@@ -220,13 +257,25 @@ public class Creator
 					{
 						int rm = rand.nextInt(names[1].length);
 						name = names[1][rm];
-						person.setProperty("gender",  "M");
+
+						person.addLabel(new Label() {
+							@Override
+							public String name() {
+								return "Male";
+							}
+						});
 					}
 					else
 					{
 						int rf = rand.nextInt(names[0].length);
 						name = names[0][rf];
-						person.setProperty("gender",  "F");
+						
+						person.addLabel(new Label() {
+							@Override
+							public String name() {
+								return "Female";
+							}
+						});
 					}
 
 					int rl = rand.nextInt(names[2].length);
@@ -239,14 +288,10 @@ public class Creator
 					int social = rand.nextInt(1000);
 					
 					if(social < 385)
-					{
-						person.setProperty("social",  "Y");
 						socialInhabitants.add(inhabitantsAdded);
-					}	
-					else
-						person.setProperty("social",  "N");
 						
 					inhabitantsIndex.add(person, "id", personId);
+					
 					person.createRelationshipTo(found, Relation.RelTypes.LIVES_IN);
 					
 					if(i > 0 && i % Main.transactionsSize == 0)
