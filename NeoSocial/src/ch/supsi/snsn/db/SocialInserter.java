@@ -1,4 +1,4 @@
-package ch.supsi.neo.db;
+package ch.supsi.snsn.db;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,9 +9,9 @@ import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 import org.neo4j.unsafe.batchinsert.BatchInserters;
 
-import ch.supsi.neo.Main;
+import ch.supsi.snsn.Main;
 
-public class SocialManager 
+public class SocialInserter 
 {
 	private BatchInserter inserter;
 	
@@ -30,15 +30,15 @@ public class SocialManager
 	 * Adds some friends to the inhabitants.
 	 */
 	public void addFriends(List<Long> si)
-	{                
+	{            
+		lStartTime = System.currentTimeMillis();
+		
 		System.out.println("Adding friends...");
 		
 		inserter = BatchInserters.inserter(Main.dbPath);
 
 		this.socialInhabitants = si;
 		
-		lStartTime = System.currentTimeMillis();
-
 		friendsAdded = 0;
 
 		int added = 0;
@@ -53,6 +53,14 @@ public class SocialManager
 			if(added % 1000 == 0)
 				System.out.println(String.format("%d / %d inhabitants - %.2f %%", added, socialInhabitants.size(), ((float)added/(float)socialInhabitants.size())*100f));
 
+			if(added > 0 && added % 10000 == 0)
+			{
+				System.out.println("Shutting down...");
+				inserter.shutdown();
+				System.out.println("Restarting...");
+				inserter = BatchInserters.inserter(Main.dbPath);
+			}
+			
 			added++;
 		}
 
@@ -91,4 +99,6 @@ public class SocialManager
 			friendsAdded++;
 		}
 	}
+	
+	
 }

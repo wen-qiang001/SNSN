@@ -1,15 +1,36 @@
-package ch.supsi.neo;
+package ch.supsi.snsn;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 public class Utilities 
 {
+	@SuppressWarnings({ "unchecked", "resource" })
+	public static List<Long> loadSocialInhabitants()
+	{
+		List<Long> socialInhabitants = null;
+		
+		try 
+		{
+            FileInputStream fileIn = new FileInputStream(Main.outputPath  + Main.snOutputFile);
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            socialInhabitants = (List<Long>)in.readObject(); 
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return socialInhabitants;
+	}
 	
 	public static String[][] getNames()
 	{
@@ -20,6 +41,11 @@ public class Utilities
 		String[][] res = {getData(path1), getData(path2), getData(path3)};
 				
 		return res;
+	}
+	
+	public static String[] getInterests()
+	{
+		throw new NotImplementedException();
 	}
 	
 	private static String[] getData(String path)

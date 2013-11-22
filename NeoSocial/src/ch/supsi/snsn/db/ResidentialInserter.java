@@ -1,5 +1,7 @@
-package ch.supsi.neo.db;
+package ch.supsi.snsn.db;
 
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,10 +20,10 @@ import org.neo4j.unsafe.batchinsert.BatchInserterIndex;
 import org.neo4j.unsafe.batchinsert.BatchInserterIndexProvider;
 import org.neo4j.unsafe.batchinsert.BatchInserters;
 
-import ch.supsi.neo.Main;
-import ch.supsi.neo.Utilities;
+import ch.supsi.snsn.Main;
+import ch.supsi.snsn.Utilities;
 
-public class InhabitantsManager 
+public class ResidentialInserter 
 {	
 	private BatchInserter inserter;
 	private BatchInserterIndexProvider indexProvider;
@@ -31,7 +33,7 @@ public class InhabitantsManager
 	private Label maleLabel   = DynamicLabel.label("Male");
 	private Label femaleLabel = DynamicLabel.label("Female");
 
-	private RelationshipType livesIn  = DynamicRelationshipType.withName("LIVES_IN");
+	private RelationshipType livesIn = DynamicRelationshipType.withName("LIVES_IN");
 	
 	private int inhabitantsAdded = 0;
 	private List<Long> socialInhabitants = new ArrayList<Long>();
@@ -51,10 +53,10 @@ public class InhabitantsManager
 	 */
 	public List<Long> addInhabitants(HashMap<Long, Integer> m)
 	{
-		System.out.println("Adding inhabitants...");
-
 		lStartTime = System.currentTimeMillis();
 		
+		System.out.println("Adding inhabitants...");
+
 		this.municipalities = m;
 		
 		inserter = BatchInserters.inserter(Main.dbPath);
@@ -86,7 +88,20 @@ public class InhabitantsManager
 		lEndTime = System.currentTimeMillis();
 
 		System.out.println(String.format("Added %d inhabitants (social %d) in %.2f seconds", inhabitantsAdded, socialInhabitants.size(), (lEndTime - lStartTime) / 1000.0));
-	
+		
+		try 
+		{
+			FileOutputStream fileOut = new FileOutputStream(Main.outputPath + Main.snOutputFile);
+	        ObjectOutputStream out = new ObjectOutputStream(fileOut);
+	        out.writeObject(socialInhabitants);
+	        out.close();
+	        fileOut.close();
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+
 		return socialInhabitants;
 	}
 

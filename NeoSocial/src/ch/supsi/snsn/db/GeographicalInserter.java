@@ -1,4 +1,4 @@
-package ch.supsi.neo.db;
+package ch.supsi.snsn.db;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,10 +15,10 @@ import org.neo4j.unsafe.batchinsert.BatchInserterIndex;
 import org.neo4j.unsafe.batchinsert.BatchInserterIndexProvider;
 import org.neo4j.unsafe.batchinsert.BatchInserters;
 
-import ch.supsi.neo.Main;
-import ch.supsi.neo.Utilities;
+import ch.supsi.snsn.Main;
+import ch.supsi.snsn.Utilities;
 
-public class GeoManager 
+public class GeographicalInserter 
 {
 	private BatchInserter inserter;
 	private BatchInserterIndexProvider indexProvider;
@@ -39,13 +39,13 @@ public class GeoManager
 	private long lEndTime;
 
 	/**
-	 * Adds cantons, regions and municipalities.
+	 * Adds Switzerland, cantons, regions and municipalities.
 	 */
 	public HashMap<Long, Integer> addGeographicalInfo()
 	{		
-		System.out.println("Adding geographical information...");
-		
 		lStartTime = System.currentTimeMillis();
+		
+		System.out.println("Adding geographical information...");
 		
 		inserter = BatchInserters.inserter(Main.dbPath);
 		indexProvider = new LuceneBatchInserterIndexProvider(inserter);
@@ -54,7 +54,7 @@ public class GeoManager
 		geoIndex.setCacheCapacity("name", 3000);
 
 		addSwitzerland();
-		addGeo();
+		addSwissGeoNodes();
 		
 		indexProvider.shutdown();
 		inserter.shutdown();
@@ -67,7 +67,7 @@ public class GeoManager
 	}
 
 	/**
-	 * Adds the main node.
+	 * Adds Switzerland as main node.
 	 */
 	private void addSwitzerland()
 	{
@@ -79,7 +79,7 @@ public class GeoManager
 	/**
 	 * Adds the additional geographic nodes.
 	 */
-	private void addGeo()
+	private void addSwissGeoNodes()
 	{
 		List<String[]> m = Utilities.splitFile(Main.filesPath + Main.geoFile);
 
