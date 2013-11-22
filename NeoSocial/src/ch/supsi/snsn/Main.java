@@ -18,7 +18,7 @@ public class Main
 	private static boolean removePrevious   = true;
 	private static boolean inhabitantsInDB  = true;
 	private static boolean addFriends  	    = true;
-	private static boolean addInterests     = true;
+	private static boolean addActivities    = true;
 	
 	public static String neoBin     = "/Users/galliva/Desktop/social/neo4j-community-2.0.0-RC1/bin/neo4j";
 	public static String dbPath     = "/Users/galliva/Desktop/social/social_graph.db";
@@ -29,6 +29,7 @@ public class Main
 	//public static String filesPath  = "C:\\Users\\Install\\Desktop\\data\\";
     //public static String outputPath = "C:\\Users\\Install\\Desktop\\output\\";
 	
+	public static String activitiesFile  = "activities.csv";
 	public static String geoFile         = "geo.csv";
 	public static String lastnamesFile   = "lastnames.csv";
 	public static String femaleNamesFile = "names_F.csv";
@@ -56,7 +57,7 @@ public class Main
 			if(addFriends)
 				s.addFriends(socialInhabitants);
 			
-			if(addInterests)
+			if(addActivities)
 				in.addAndRelateActivities(socialInhabitants);
 						
 			if(startStopService)

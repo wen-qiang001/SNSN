@@ -10,7 +10,11 @@ import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.helpers.collection.MapUtil;
+import org.neo4j.index.lucene.unsafe.batchinsert.LuceneBatchInserterIndexProvider;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
+import org.neo4j.unsafe.batchinsert.BatchInserterIndex;
+import org.neo4j.unsafe.batchinsert.BatchInserterIndexProvider;
 import org.neo4j.unsafe.batchinsert.BatchInserters;
 
 import ch.supsi.snsn.Main;
@@ -19,6 +23,8 @@ import ch.supsi.snsn.Utilities;
 public class ActivityInserter 
 {
 	private BatchInserter inserter;
+	private BatchInserterIndexProvider indexProvider;
+	private BatchInserterIndex activityIndex;
 	
 	private Label activityLabel = DynamicLabel.label("Activity");
 	
@@ -27,7 +33,6 @@ public class ActivityInserter
 	private List<Long> activities = new ArrayList<Long>();
 	
 	private Random rand = new Random();
-	private String[] activitiesList = Utilities.getInterests();
 	
 	private long lStartTime;
 	private long lEndTime;
@@ -42,14 +47,20 @@ public class ActivityInserter
 	{
 		lStartTime = System.currentTimeMillis();
 		
+		
 		System.out.println("Adding activities...");
 		
 		inserter = BatchInserters.inserter(Main.dbPath);
+		indexProvider = new LuceneBatchInserterIndexProvider(inserter);
+
+		activityIndex = indexProvider.nodeIndex("activityIndex", MapUtil.stringMap("type", "exact"));
+		activityIndex.setCacheCapacity("name", 1000);
 
 		addActivities();
 		
 		System.out.println("Shutting down...");
 		
+		indexProvider.shutdown();
 		inserter.shutdown();
 		
 		
@@ -66,6 +77,7 @@ public class ActivityInserter
 		
 		inserter.shutdown();
 		
+		
 		lEndTime = System.currentTimeMillis();
 
 		System.out.println(String.format("Added %d activities in %.2f seconds", activities, (lEndTime - lStartTime) / 1000.0));
@@ -76,12 +88,18 @@ public class ActivityInserter
 	 */
 	private void addActivities()
 	{
-		for (int i = 0; i < activitiesList.length; i++)
+		List<String[]> acts = Utilities.splitFile(Main.filesPath + Main.activitiesFile);
+		
+		for (int i = 0; i < acts.size(); i++)
 		{
 			Map<String, Object> properties = new HashMap<>();
-			properties.put("name", activitiesList[i]);
+			properties.put("name", acts.get(i));
 
-			activities.add(inserter.createNode(properties, activityLabel));
+			long a = inserter.createNode(properties, activityLabel);
+			
+			activityIndex.add(a, properties);
+			
+			activities.add(a);
 		}
 	}
 	

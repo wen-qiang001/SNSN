@@ -9,10 +9,12 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 public class Utilities 
 {
+	/**
+	 * Load the social inhabitants from a previously saved file.
+	 * @return
+	 */
 	@SuppressWarnings({ "unchecked", "resource" })
 	public static List<Long> loadSocialInhabitants()
 	{
@@ -32,32 +34,11 @@ public class Utilities
 		return socialInhabitants;
 	}
 	
-	public static String[][] getNames()
-	{
-		String path1 = Main.filesPath + Main.femaleNamesFile;
-		String path2 = Main.filesPath + Main.maleNamesFile;
-		String path3 = Main.filesPath + Main.lastnamesFile;
-		
-		String[][] res = {getData(path1), getData(path2), getData(path3)};
-				
-		return res;
-	}
-	
-	public static String[] getInterests()
-	{
-		throw new NotImplementedException();
-	}
-	
-	private static String[] getData(String path)
-	{
-		ArrayList<String> result = new ArrayList<String>();
-				
-		for (String[] s : splitFile(path)) 
-			result.add(s[0]);
-		
-		return result.toArray(new String[0]);
-	}
-	
+	/**
+	 * Splits a file.
+	 * @param fileName
+	 * @return
+	 */
 	public static List<String[]> splitFile(String fileName)
 	{
 		List<String[]> result = new ArrayList<String[]>();
@@ -85,5 +66,30 @@ public class Utilities
 		}
 
 		return result;
+	}
+	
+	/**
+	 * Gets some available first and last names.
+	 * @return
+	 */
+	public static String[][] getNames()
+	{
+		String path1 = Main.filesPath + Main.femaleNamesFile;
+		String path2 = Main.filesPath + Main.maleNamesFile;
+		String path3 = Main.filesPath + Main.lastnamesFile;
+		
+		String[][] res = {getData(path1), getData(path2), getData(path3)};
+				
+		return res;
+	}
+		
+	private static String[] getData(String path)
+	{
+		ArrayList<String> result = new ArrayList<String>();
+				
+		for (String[] s : splitFile(path)) 
+			result.add(s[0]);
+		
+		return result.toArray(new String[0]);
 	}
 }

@@ -1,4 +1,4 @@
-SNSN - Social Network Simulation in Neo4j
+Social Network Simulation in Neo4j
 ======
 
 Simulation of a social network in Switzerland:
