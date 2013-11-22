@@ -15,15 +15,16 @@ public class Main
 	public static int totalInhabitants  = 8039060;
 	
 	private static boolean startStopService = false;
-	private static boolean removePrevious   = true;
-	private static boolean inhabitantsInDB  = true;
+	private static boolean removePrevious   = false;
+	private static boolean inhabitantsInDB  = false;
 	private static boolean addFriends  	    = true;
-	private static boolean addActivities    = true;
+	private static boolean addActivities    = false;
 	
-	public static String neoBin     = "/Users/galliva/Desktop/social/neo4j-community-2.0.0-RC1/bin/neo4j";
-	public static String dbPath     = "/Users/galliva/Desktop/social/social_graph.db";
-	public static String filesPath  = "/Users/galliva/Desktop/social/data/";
-	public static String outputPath = "/Users/galliva/Desktop/social/output/";
+	public static String neoBin     = "/Users/galliva/Desktop/SNSN/neo4j-community-2.0.0-RC1/bin/neo4j";
+	//public static String dbPath     = "/Users/galliva/Desktop/SNSN/social_graph.db";
+	public static String dbPath     = "/Volumes/AC601/social_graph.db";
+	public static String filesPath  = "/Users/galliva/Desktop/SNSN/data/";
+	public static String outputPath = "/Users/galliva/Desktop/SNSN/output/";
 	
 	//public static String dbPath     = "C:\\Users\\Install\\Desktop\\social_graph.db";
 	//public static String filesPath  = "C:\\Users\\Install\\Desktop\\data\\";

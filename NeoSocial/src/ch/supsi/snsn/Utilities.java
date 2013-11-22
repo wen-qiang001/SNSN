@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,9 +46,11 @@ public class Utilities
 
 		BufferedReader br;
 
+		Charset cs = Charset.forName("UTF-8");
+		
 		try
 		{
-			br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "ISO-8859-1"));
+			br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), cs));
 			
 			String line;
 			while ((line = br.readLine()) != null)
