@@ -21,10 +21,15 @@ public class Main
 	private static boolean addActivities    = false;
 	
 	public static String neoBin     = "/Users/galliva/Desktop/SNSN/neo4j-community-2.0.0-RC1/bin/neo4j";
-	//public static String dbPath     = "/Users/galliva/Desktop/SNSN/social_graph.db";
-	public static String dbPath     = "/Volumes/AC601/social_graph.db";
+	//public static String dbPath     = "/Volumes/neo/social_graph.db";
+	public static String dbPath     = "/Users/galliva/Desktop/SNSN/social_graph.db";
 	public static String filesPath  = "/Users/galliva/Desktop/SNSN/data/";
 	public static String outputPath = "/Users/galliva/Desktop/SNSN/output/";
+
+//	public static String neoBin     = "/home/azureuser/neo4j-community-2.0.0-RC1/bin/neo4j";
+//	public static String dbPath     = "/home/azureuser/social_graph.db";
+//	public static String filesPath  = "/home/azureuser/data/";
+//	public static String outputPath = "/home/azureuser/output/";
 	
 	//public static String dbPath     = "C:\\Users\\Install\\Desktop\\social_graph.db";
 	//public static String filesPath  = "C:\\Users\\Install\\Desktop\\data\\";
