@@ -1,6 +1,7 @@
 lib
 neo4j-community-2.0.0-M06
 neo4j-community-2.0.0-RC1
+NeoSocial/.idea
 output
 social_graph.db
 
