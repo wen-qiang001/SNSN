@@ -31,6 +31,7 @@ public class ActivityInserter
 	private RelationshipType interestedIn = DynamicRelationshipType.withName("INTERESTED_IN");
 	
 	private List<Long> activities = new ArrayList<Long>();
+	private int interestsAdded = 0;
 	
 	private Random rand = new Random();
 	
@@ -44,9 +45,16 @@ public class ActivityInserter
 	 * @param si
 	 */
 	public void addAndRelateActivities(List<Long> si)
+	{				
+		this.socialInhabitants = si;
+		
+		manageActivities();
+		manageInterests();
+	}
+	
+	private void manageActivities()
 	{
 		lStartTime = System.currentTimeMillis();
-		
 		
 		System.out.println("Adding activities...");
 		
@@ -63,24 +71,9 @@ public class ActivityInserter
 		indexProvider.shutdown();
 		inserter.shutdown();
 		
-		
-		System.out.println("Relating activities to the inhabitants...");
-		
-		inserter = BatchInserters.inserter(Main.dbPath);
-		
-		this.socialInhabitants = si;
-		
-		for (long inhabitant : socialInhabitants) 
-			addInterests(inhabitant);
-		
-		System.out.println("Shutting down...");
-		
-		inserter.shutdown();
-		
-		
 		lEndTime = System.currentTimeMillis();
-
-		System.out.println(String.format("Added %d activities in %.2f seconds", activities, (lEndTime - lStartTime) / 1000.0));
+		
+		System.out.println(String.format("Added %d activities in %.2f seconds", activities.size(), (lEndTime - lStartTime) / 1000.0));
 	}
 	
 	/**
@@ -92,8 +85,10 @@ public class ActivityInserter
 		
 		for (int i = 0; i < acts.size(); i++)
 		{
+			String act = acts.get(i)[0];
+			
 			Map<String, Object> properties = new HashMap<>();
-			properties.put("name", acts.get(i));
+			properties.put("name", act);
 
 			long a = inserter.createNode(properties, activityLabel);
 			
@@ -103,14 +98,51 @@ public class ActivityInserter
 		}
 	}
 	
+	public void manageInterests()
+	{
+		lStartTime = System.currentTimeMillis();	
+		
+		System.out.println("Relating activities to the inhabitants...");
+		
+		inserter = BatchInserters.inserter(Main.dbPath);
+		
+		int added = 0;
+		
+		for (long inhabitant : socialInhabitants) 
+		{
+			addInterests(inhabitant);
+
+			if(added % 1000 == 0)
+				System.out.println(String.format("%d / %d inhabitants - %.2f %%", added, socialInhabitants.size(), ((float)added/(float)socialInhabitants.size())*100f));
+			
+			if(added % 200000 == 0)
+			{
+				System.out.println("Shutting down...");
+				inserter.shutdown();
+				System.out.println("Restarting...");
+				inserter = BatchInserters.inserter(Main.dbPath);
+			}
+			
+			added++;
+		}
+			
+		System.out.println("Shutting down...");
+		
+		inserter.shutdown();
+		
+		lEndTime = System.currentTimeMillis(); 
+		
+		System.out.println(String.format("%d activities related in %.2f seconds", interestsAdded, (lEndTime - lStartTime) / 1000.0));
+	}
+	
 	/**
 	 * Relates each social inhabitant to some activities.
 	 * @param inhabitant
 	 */
 	private void addInterests(long inhabitant)
 	{
-		//  the average interests count is 15 
-		int no = (int) (rand.nextGaussian()*5) + 15;
+		//  the average interests count is 10 
+		int no = (int) (rand.nextGaussian()*5) + 10;
 		
 		for (int i = 0; i < no; i++) 
 		{
@@ -119,6 +151,8 @@ public class ActivityInserter
 			long interest = activities.get(r);
 			
 			inserter.createRelationship(inhabitant, interest, interestedIn, null);
+			
+			interestsAdded++;
 		}
 	}
 }

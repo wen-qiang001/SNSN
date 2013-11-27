@@ -12,16 +12,15 @@ import ch.supsi.snsn.db.SocialInserter;
 
 public class Main 
 {	
-	public static int totalInhabitants  = 8039060;
+	public static int totalInhabitants      = 8039060;
 	
 	private static boolean startStopService = false;
 	private static boolean removePrevious   = false;
-	private static boolean inhabitantsInDB  = false;
-	private static boolean addFriends  	    = true;
-	private static boolean addActivities    = false;
+	private static boolean addInhabitants   = false;
+	private static boolean addFriends  	    = false;
+	private static boolean addActivities    = true;
 	
 	public static String neoBin     = "/Users/galliva/Desktop/SNSN/neo4j-community-2.0.0-RC1/bin/neo4j";
-	//public static String dbPath     = "/Volumes/neo/social_graph.db";
 	public static String dbPath     = "/Users/galliva/Desktop/SNSN/social_graph.db";
 	public static String filesPath  = "/Users/galliva/Desktop/SNSN/data/";
 	public static String outputPath = "/Users/galliva/Desktop/SNSN/output/";
@@ -58,7 +57,7 @@ public class Main
 			if(removePrevious)
 				FileUtils.deleteDirectory(new File(dbPath));
 		
-			List<Long> socialInhabitants = (inhabitantsInDB) ? Utilities.loadSocialInhabitants() : i.addInhabitants(g.addGeographicalInfo());
+			List<Long> socialInhabitants = (addInhabitants) ? i.addInhabitants(g.addGeographicalInfo()) : Utilities.loadSocialInhabitants();
 					
 			if(addFriends)
 				s.addFriends(socialInhabitants);
