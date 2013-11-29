@@ -2,19 +2,19 @@
 Tot. nodes 
 ===
 
-Default node	     1
-Switzerland  	     1
-Cantons	     	    26
-Regions		   139
-Municipalities	  2485
+Default node         1
+Switzerland          1
+Cantons             26
+Regions            139
+Municipalities    2485
 Inhabitants  8’039’060 
 Activities          50
 
-	     8’041’762
+             8’041’762
 
 Indexes
 ===
 
-geoIndex:	cantons, regions, municipalities
-peopleIndex: 	inhabitants
-activityIndex:	activities
+geoIndex:      cantons, regions, municipalities
+peopleIndex:   inhabitants
+activityIndex: activities
