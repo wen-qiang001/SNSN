@@ -16,8 +16,8 @@ public class Main
 	
 	private static boolean startStopService = false;
 	private static boolean removePrevious   = false;
-	private static boolean addInhabitants   = false;
-	private static boolean addFriends  	    = false;
+	private static boolean addInhabitants   = true;
+	private static boolean addFriends  	    = true;
 	private static boolean addActivities    = true;
 	
 //	public static String neoBin     = "/Users/galliva/Desktop/SNSN/neo4j-community-2.0.0-RC1/bin/neo4j";
@@ -30,7 +30,7 @@ public class Main
 	public static String outputPath = "/home/azureuser/output/";
 	
 	public static String activitiesFile  = "activities.csv";
-	public static String geoFile         = "geo.csv";
+	public static String geoFile         = "geo_subset.csv";
 	public static String lastnamesFile   = "lastnames.csv";
 	public static String femaleNamesFile = "names_F.csv";
 	public static String maleNamesFile   = "names_M.csv";

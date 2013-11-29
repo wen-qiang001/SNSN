@@ -1,41 +1,45 @@
+// ask index to get a node
 START n=node:geoIndex(name = "Corippo")
 RETURN n
 
-START n=node:peopleIndex('first_name: Moreno AND last_name: Rigolet')
-RETURN n
+// a simple match
+START n=node:peopleIndex('first_name: Alba AND last_name: Scherer')
+MATCH n-[:LIVES_IN]->p
+RETURN p
 
-START n=node:peopleIndex('first_name: Moreno AND last_name: Rigolet')
+// with clause
+START n=node:peopleIndex('first_name: Alba AND last_name: Scherer')
 MATCH n-[:LIVES_IN]->()-[:IS_IN]->district 
 WITH district
-MATCH district<-[:IS_IN]-(city)<-[:LIVES_IN]-people 
-RETURN people, city
-LIMIT 100
+MATCH district<-[:IS_IN]-(city)
+RETURN city
 
-START a=node:peopleIndex('first_name: Moreno AND last_name: Rigolet')
+// variable length relationships
+START a=node:peopleIndex('first_name: Alba AND last_name: Scherer')
 MATCH (a)-[r:FRIEND_OF*1..2]->(b)
 RETURN length(r), b
 LIMIT 1000
 
-START n=node:peopleIndex('first_name: Moreno AND last_name: Rigolet')
+// paths
+START m=node:peopleIndex('first_name: Alba AND last_name: Scherer'), g=node:peopleIndex('first_name: Célia AND last_name: Kutter')
+MATCH p = shortestPath((m)-[*]-(g))
+RETURN p
+
+START m=node:peopleIndex('first_name: Alba AND last_name: Scherer'), g=node:peopleIndex('first_name: Célia AND last_name: Kutter')
+MATCH p = allShortestPaths((m)-[*]-(g))
+RETURN p
+LIMIT 5
+
+START m=node:peopleIndex('first_name: Alba AND last_name: Scherer'), g=node:peopleIndex('first_name: Célia AND last_name: Kutter')
+MATCH p = shortestPath((m)-[:LIVES_IN|IS_IN]-(g))
+RETURN p
+
+// other examples
+START n=node:peopleIndex('first_name: Alba AND last_name: Scherer')
 MATCH n-[:LIVES_IN]->()-[:IS_IN]->()-[:IS_IN]->canton
 WITH n, canton
 MATCH canton<-[:IS_IN]-()<-[:IS_IN]-()<-[:LIVES_IN]-friend-[:FRIEND_OF]->n
 RETURN friend
 
-START n=node:peopleIndex('first_name: Moreno AND last_name: Rigolet')
-MATCH n-[:LIVES_IN]->(nc)-[:IS_IN]->(nr)-[:IS_IN]->canton
-WITH n, canton, nc, nr
-MATCH canton<-[:IS_IN]-(region)<-[:IS_IN]-(city)<-[:LIVES_IN]-friend<-[r:FRIEND_OF]-n
-RETURN n, friend, city, region, nc, nr, canton
+// query interessi
 
-START m=node:peopleIndex('first_name: Moreno AND last_name: Rigolet'), g=node:peopleIndex('first_name: Gustavo AND last_name: Brique')
-MATCH p = allShortestPaths((m)-[*]-(g))
-RETURN p
-
-START m=node:peopleIndex('first_name: Moreno AND last_name: Rigolet'), g=node:peopleIndex('first_name: Felicia AND last_name: Burn')
-MATCH p = allShortestPaths((m)-[*]-(g))
-RETURN p
-
-START m=node:peopleIndex('first_name: Moreno AND last_name: Rigolet'), g=node:peopleIndex('first_name: Niels AND last_name: Velti')
-MATCH p = allShortestPaths((m)-[*]-(g))
-RETURN p
