@@ -144,9 +144,21 @@ public class ActivityInserter
 		//  the average interests count is 10 
 		int no = (int) (rand.nextGaussian()*5) + 10;
 		
+		ArrayList<Integer> alreadyAdded = new ArrayList<Integer>();
+		
 		for (int i = 0; i < no; i++) 
 		{
-			int r = rand.nextInt(activities.size());
+			int r;
+			
+			while(true)
+			{
+				r = rand.nextInt(activities.size());
+
+				if(!alreadyAdded.contains(r));
+					break;
+			}
+			
+			alreadyAdded.add(r);
 			
 			long interest = activities.get(r);
 			

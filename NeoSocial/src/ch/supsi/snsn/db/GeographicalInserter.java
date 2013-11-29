@@ -132,9 +132,6 @@ public class GeographicalInserter
 
 				geoIndex.add(currentMunicipality, properties);
 			}
-			
-			if(municipalities.size() > 6)
-				return;
 		}
 	}
 }

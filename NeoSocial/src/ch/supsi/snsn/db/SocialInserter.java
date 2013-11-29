@@ -50,7 +50,7 @@ public class SocialInserter
 
 			addFriendsToInhabitant(inhabitant, (int)n);
 
-			if(added % 1000 == 0)
+			if(added % 10000 == 0)
 				System.out.println(String.format("%d / %d inhabitants - %.2f %%", added, socialInhabitants.size(), ((float)added/(float)socialInhabitants.size())*100f));
 
 			if(added > 0 && added % 10000 == 0)
