@@ -13,5 +13,3 @@ social_graph.db
 *.ear
 
 NeoSocial/.classpath
-
-NeoSocial/src/ch/supsi/snsn/Main.java
