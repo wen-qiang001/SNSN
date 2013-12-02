@@ -38,8 +38,12 @@ RETURN p
 START n=node:peopleIndex('first_name: Alba AND last_name: Scherer')
 MATCH n-[:LIVES_IN]->()-[:IS_IN]->()-[:IS_IN]->canton
 WITH n, canton
-MATCH canton<-[:IS_IN]-()<-[:IS_IN]-()<-[:LIVES_IN]-friend-[:FRIEND_OF]->n
-RETURN friend
+MATCH canton<-[:IS_IN]-(district)<-[:IS_IN]-(city)<-[:LIVES_IN]-friend-[:FRIEND_OF]->n
+RETURN n, friend, canton, district, city
 
-// query interessi
+START p=node:peopleIndex('first_name: Alba AND last_name:Scherer'), i=node:activityIndex('name: Cooking')
+MATCH (p)-[:LIVES_IN]->(a)-[:IS_IN]->(b)
+MATCH f = AllshortestPaths(b-[*]-i)
+RETURN f
+LIMIT 20
 
